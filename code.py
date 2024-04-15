@@ -2,6 +2,7 @@ import os
 import json
 import pandas as pd
 import requests
+from datetime import datetime
 
 def get_vehicle_ids_from_csv(filename, column_name):
     df = pd.read_csv(filename)
@@ -16,7 +17,8 @@ def get_response_details(vehicle_id):
     return status_code, content
 
 def save_to_file(vehicle_id, content):
-    directory = 'vehicle_data'
+    today_date = datetime.now().strftime('%Y-%m-%d')
+    directory = f'Data/{today_date}'
     if not os.path.exists(directory):
         os.makedirs(directory)
     filename = os.path.join(directory, f"{vehicle_id}.json")
