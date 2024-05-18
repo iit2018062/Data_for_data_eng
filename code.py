@@ -1,5 +1,5 @@
 import os
-import json
+import csv
 import pandas as pd
 import requests
 from datetime import datetime
@@ -21,9 +21,22 @@ def save_to_file(vehicle_id, content):
     directory = f'Data/{today_date}'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename = os.path.join(directory, f"{vehicle_id}.json")
-    with open(filename, 'w') as f:
-        json.dump(content, f, indent=4)
+    filename = os.path.join(directory, f"{today_date}.csv")  # Use today's date for the filename
+
+    # Write data to CSV file if status code is 200
+    if content and status_code == 200:
+        with open(filename, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+
+            # Write header
+            writer.writerow(content[0].keys())
+
+            # Write rows
+            for item in content:
+                writer.writerow(item.values())
+        print(f"Data for Vehicle ID {vehicle_id} saved to file: {filename}")
+    else:
+        print(f"Data for Vehicle ID {vehicle_id} not saved. Status code: {status_code}")
 
 # Example usage:
 filename = 'vehicle_ids - Sheet1.csv'
@@ -36,4 +49,4 @@ for vehicle_id in vehicle_ids:
     print("Response Content:")
     print(content)
     save_to_file(vehicle_id, content)
-    print("Data saved to file.\n")
+    print()
