@@ -70,7 +70,7 @@ def save_to_csv(events: List[Dict[str, Any]]):
     if not events:
         return
 
-    csv_filename = "all_vehicles_events.csv"
+    csv_filename = "all_vehicles_events_.csv"
     fieldnames = events[0].keys()
 
     try:
