@@ -5,6 +5,7 @@ import requests
 import threading
 from bs4 import BeautifulSoup
 from typing import Dict, Any, List
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -69,8 +70,9 @@ def save_to_csv(events: List[Dict[str, Any]]):
     """
     if not events:
         return
+    today_date = datetime.now().strftime('%Y-%m-%d')
 
-    csv_filename = "all_vehicles_events_.csv"
+    csv_filename = f"{today_date}.csv"
     fieldnames = events[0].keys()
 
     try:
