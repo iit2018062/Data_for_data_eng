@@ -12,19 +12,28 @@ def get_vehicle_ids_from_csv(filename, column_name):
 
 def get_response_details(vehicle_id):
     url = f"https://busdata.cs.pdx.edu/api/getBreadCrumbs?vehicle_id={vehicle_id}"
-    response = requests.get(url)
-    status_code = response.status_code
-    content = response.json()
-    return status_code, content
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # This will raise an HTTPError for bad responses
+        try:
+            content = response.json()
+        except json.JSONDecodeError:
+            print(f"Vehicle ID: {vehicle_id} - Response content is not in JSON format")
+            content = None
+    except requests.exceptions.RequestException as e:
+        print(f"Vehicle ID: {vehicle_id} - Request failed: {e}")
+        content = None
+        response = None
 
-def save_to_file(vehicle_id, content):
+    return response.status_code if response else None, content
+
+def save_to_file(vehicle_id, content, status_code):
     today_date = datetime.now().strftime('%Y-%m-%d')
     directory = f'Data/{today_date}'
     if not os.path.exists(directory):
         os.makedirs(directory)
-    filename = os.path.join(directory, f"{vehicle_id}.json")  # Use vehicle ID for the filename
+    filename = os.path.join(directory, f"{vehicle_id}.json")
 
-    # Write data to JSON file if status code is 200
     if content and status_code == 200:
         with open(filename, 'w') as jsonfile:
             json.dump(content, jsonfile, indent=4)
@@ -42,5 +51,5 @@ for vehicle_id in vehicle_ids:
     print(f"Vehicle ID: {vehicle_id}, Response Status: {status_code}")
     print("Response Content:")
     print(content)
-    save_to_file(vehicle_id, content)
+    save_to_file(vehicle_id, content, status_code)
     print()
